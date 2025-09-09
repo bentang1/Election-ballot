@@ -48,7 +48,7 @@ Dated: 04/09/2025
 int getword(char W[], int limit);
 // add your other function prototypes here
 void read_input(int *m_out, char names[][MAXNAME], int ballots[][MAXCANDIDATES], int *numvotes_out);
-void print_last_rank(int m, int numvotes, char names[][MAXNAME], int ballots[][MAXCANDIDATES]);
+void print_eliminating_candidates(int m, int numvotes, char names[][MAXNAME], int ballots[][MAXCANDIDATES]);
 /*
 
 */
@@ -68,7 +68,7 @@ main(int argc, char *argv[]) {
     read_input(&m, names, ballots, &numvotes);
     printf("Stage 1\n=======\n");
     printf("read %d candidates and %d votes\n", m, numvotes);
-    print_last_rank(m, numvotes, names, ballots);
+    print_eliminating_candidates(m, numvotes, names, ballots);
 
     
     // all done, time to go home
@@ -135,20 +135,53 @@ void read_input(int *m_out, char names[][MAXNAME],
     *numvotes_out = voters;
 }
 
-void print_last_rank(int m, int numvotes, char names[][MAXNAME], int ballots[][MAXCANDIDATES]){
-    printf("voter %d preferences...\n", numvotes);
-    int last_voter = numvotes -1;
-    for(int rank = 1; rank <= m; rank++){
+void print_eliminating_candidates(int m, int numvotes, char names[][MAXNAME], int ballots[][MAXCANDIDATES]){
+
+    int eliminated[MAXCANDIDATES] = {0};
+    int rounds = 0;
+
+    while(1){
+        rounds++;
+        int count[MAXCANDIDATES] = {0};
+        int active_cand = 0;
+        
+
+        //the first choice for non eliminated
+        for (int voter = 0; voter < numvotes; voter++){
+            for (int rank = 1; rank <= m; rank++){
+                int exit = 0;
+                for (int cand = 0; cand < m; cand ++){
+                    if(!eliminated[cand] && ballots[voter][cand] == rank){
+                        count[cand]++;
+                        exit = 1;
+                        break;
+                    }
+                }
+                if(exit){
+                    break;
+                }
+                }
+            }
+        
+        //printing the rounds
+        printf("round %d:\n", rounds);
         for(int cand = 0; cand < m; cand++){
-            if( rank == ballots[last_voter][cand]){
-                printf("    rank %d: %s\n", rank, names[cand]);
+            if(!eliminated[cand]){
+                double percentage = (count[cand] * 100.0)/ numvotes;
+                printf("%s has %d and the percentage is %.2f", names[cand], count[cand], percentage);
+                active_cand++;
             }
         }
+
+
+
     }
 }
 
 
 /*
-
+to begin with, i need a loop for the amount of rounds and that essentially is based of the voters
+such that for(int rounds = 1; rounds <= m (candidates); rounds ++);
+then i need to loop for each of the candidates and see if if they have anything that is the saem as the rounds.
+{if (ballot[][]== rounds{something +1}}
 */
-
